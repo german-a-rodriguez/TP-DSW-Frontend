@@ -1,12 +1,11 @@
-# TP-DSW-Backend
-# React + TypeScript + Vite
+# TP-DSW-Frontend (React + TypeScript + Vite)
 
 ## Guía de Inicio Rápido
 
 ### 1. Clonar el repositorio e instalar dependencias
 
 ```bash
-[git clone https://github.com/SantiagoPacenza/TP-DSW-Backend.git](https://github.com/german-a-rodriguez/TP-DSW-Frontend.git)
+git clone https://github.com/german-a-rodriguez/TP-DSW-Frontend.git
 cd TP-DSW-Frontend
 npm install
 ```

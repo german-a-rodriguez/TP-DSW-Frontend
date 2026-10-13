@@ -15,7 +15,7 @@ npm install
 - Una vez configurado todo, levantar el servidor con el comando:
 
 ```bash
-npm run start:dev
+npm run dev
 ```
 
 - Si está todo bien, en la terminal deberias ver: Servidor escuchando de manera local en http://localhost:5173

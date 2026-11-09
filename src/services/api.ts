@@ -18,11 +18,11 @@ export async function peticionApi(
     throw new Error('No se pudo conectar con el servidor. Revisá tu conexión.');
   }
 
-  // Si la sesión venció (401), limpiamos y avisamos
+  // Si la sesión venció (401), limpiamos el token y recargamos para volver al login
   if (response.status === 401 && endpoint !== '/login') {
     localStorage.removeItem('token');
     localStorage.removeItem('rol');
-    window.dispatchEvent(new Event('sesion-expirada'));
+    window.location.reload();
     throw new Error('Tu sesión venció. Iniciá sesión nuevamente.');
   }
 

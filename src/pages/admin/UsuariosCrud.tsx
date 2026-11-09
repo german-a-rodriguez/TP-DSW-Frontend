@@ -29,7 +29,6 @@ export function UsuariosCrud() {
   const [entrenadorSeleccionado, setEntrenadorSeleccionado] = useState<Usuario | null>(null);
   const [disciplinasSeleccionadas, setDisciplinasSeleccionadas] = useState<number[]>([]);
 
-  const [cargandoDisciplinas, setCargandoDisciplinas] = useState(false);
   const [error, setError] = useState('');
   const [mensaje, setMensaje] = useState('');
 
@@ -67,7 +66,6 @@ export function UsuariosCrud() {
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (cargandoDisciplinas) return;
     setError('');
     setMensaje('');
 
@@ -119,7 +117,6 @@ export function UsuariosCrud() {
   };
 
   const handleEliminar = async (id: number) => {
-    if (cargandoDisciplinas) return;
     if (!window.confirm('¿Estás seguro de eliminar este usuario?')) return;
     setError('');
     setMensaje('');
@@ -134,22 +131,14 @@ export function UsuariosCrud() {
   };
 
   const abrirDisciplinasEntrenador = async (id: number) => {
-    if (cargandoDisciplinas) return;
     setError('');
     setMensaje('');
-    setEntrenadorSeleccionado(null);
-    setCargandoDisciplinas(true);
     try {
       const entrenador = await obtenerUsuarioPorId(id);
-      if (!Array.isArray(entrenador.disciplinas)) {
-        throw new Error('No se pudieron consultar las disciplinas asignadas al entrenador.');
-      }
-      setDisciplinasSeleccionadas(entrenador.disciplinas.map((disciplina) => disciplina.id));
+      setDisciplinasSeleccionadas((entrenador.disciplinas || []).map((d) => d.id));
       setEntrenadorSeleccionado(entrenador);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudieron cargar las disciplinas.');
-    } finally {
-      setCargandoDisciplinas(false);
     }
   };
 
@@ -162,7 +151,6 @@ export function UsuariosCrud() {
   };
 
   const guardarDisciplinasEntrenador = async () => {
-    if (cargandoDisciplinas) return;
     if (!entrenadorSeleccionado) return;
     setError('');
     setMensaje('');
@@ -179,12 +167,11 @@ export function UsuariosCrud() {
   return (
     <div>
       <h2>Usuarios</h2>
-      {cargandoDisciplinas && <p role="status">Cargando disciplinas del entrenador…</p>}
       {error && <div className="mensaje-error">{error}</div>}
       {mensaje && <div className="mensaje-exito">{mensaje}</div>}
 
       <form onSubmit={handleSubmit} className="tarjeta">
-        <fieldset disabled={cargandoDisciplinas} className="campos-formulario">
+        <div className="campos-formulario">
           <h3>{editandoId ? `Editando Usuario #${editandoId}` : 'Nuevo Usuario'}</h3>
 
           <div className="grilla-form">
@@ -274,16 +261,16 @@ export function UsuariosCrud() {
           </div>
 
           <div className="acciones-celda">
-            <button disabled={cargandoDisciplinas} type="submit" className="btn btn-azul">
+            <button type="submit" className="btn btn-azul">
               {editandoId ? 'Guardar Cambios' : 'Crear Usuario'}
             </button>
             {editandoId && (
-              <button disabled={cargandoDisciplinas} type="button" onClick={limpiarFormulario} className="btn btn-gris">
+              <button type="button" onClick={limpiarFormulario} className="btn btn-gris">
                 Cancelar
               </button>
             )}
           </div>
-        </fieldset>
+        </div>
       </form>
 
       {entrenadorSeleccionado && (
@@ -298,7 +285,6 @@ export function UsuariosCrud() {
               <label key={d.id}>
                 <input
                   type="checkbox"
-                  disabled={cargandoDisciplinas}
                   checked={disciplinasSeleccionadas.includes(d.id)}
                   onChange={() => toggleDisciplinaEntrenador(d.id)}
                 />{' '}
@@ -307,10 +293,10 @@ export function UsuariosCrud() {
             ))}
           </div>
           <div className="acciones-celda">
-            <button disabled={cargandoDisciplinas} onClick={guardarDisciplinasEntrenador} className="btn btn-azul">
+            <button onClick={guardarDisciplinasEntrenador} className="btn btn-azul">
               Guardar Disciplinas
             </button>
-            <button disabled={cargandoDisciplinas} onClick={() => setEntrenadorSeleccionado(null)} className="btn btn-gris">
+            <button onClick={() => setEntrenadorSeleccionado(null)} className="btn btn-gris">
               Cerrar
             </button>
           </div>
@@ -350,18 +336,18 @@ export function UsuariosCrud() {
                   <td>{u.fechaNacimiento ? u.fechaNacimiento.slice(0, 10) : '-'}</td>
                   <td>{u.telefono || '-'}</td>
                   <td className="acciones-celda">
-                    <button disabled={cargandoDisciplinas} onClick={() => seleccionarParaEditar(u)} className="btn btn-azul">
+                    <button onClick={() => seleccionarParaEditar(u)} className="btn btn-azul">
                       Editar
                     </button>
                     {u.rol === 'entrenador' && (
-                      <button disabled={cargandoDisciplinas}
+                      <button
                         onClick={() => abrirDisciplinasEntrenador(u.id)}
                         className="btn btn-verde"
                       >
                         Disciplinas
                       </button>
                     )}
-                    <button disabled={cargandoDisciplinas} onClick={() => handleEliminar(u.id)} className="btn btn-rojo">
+                    <button onClick={() => handleEliminar(u.id)} className="btn btn-rojo">
                       Eliminar
                     </button>
                   </td>

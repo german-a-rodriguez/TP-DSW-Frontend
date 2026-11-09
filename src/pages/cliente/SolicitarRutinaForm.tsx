@@ -12,7 +12,7 @@ export function SolicitarRutinaForm() {
   const [error, setError] = useState('');
   const [mensaje, setMensaje] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setError('');

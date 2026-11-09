@@ -67,7 +67,7 @@ export function SolicitudesList({ onIrACrearRutina }: SolicitudesListProps) {
     cargarDetalleSolicitud(id);
   };
 
-  const handleGuardarDetalle = async (e: React.FormEvent) => {
+  const handleGuardarDetalle = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!solicitudDetalle) return;
     setError('');

@@ -22,7 +22,7 @@ export function RegistroPage({
   const [error, setError] = useState('');
   const [mensajeExito, setMensajeExito] = useState('');
 
-  const handleAutorregistroSubmit = async (evento: React.FormEvent) => {
+  const handleAutorregistroSubmit = async (evento: React.SubmitEvent<HTMLFormElement>) => {
     evento.preventDefault();
     setError('');
     setMensajeExito('');

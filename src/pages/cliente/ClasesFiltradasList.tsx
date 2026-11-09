@@ -79,7 +79,7 @@ export function ClasesFiltradasList() {
     cargarDetalleClase(id);
   };
 
-  const handleGuardarDetalle = async (e: React.FormEvent) => {
+  const handleGuardarDetalle = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!claseDetalle) return;
     setError('');

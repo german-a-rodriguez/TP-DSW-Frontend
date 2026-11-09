@@ -36,7 +36,7 @@ export function MembresiasPage() {
     iniciar();
   }, []);
 
-  const contratarPlan = async (e: React.FormEvent) => {
+  const contratarPlan = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setMensaje('');

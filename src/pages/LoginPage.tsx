@@ -12,7 +12,7 @@ export function LoginPage({ onLoginSuccess, onGoToRegister }: LoginPageProps) {
   const [contrasenia, setContrasenia] = useState('');
   const [error, setError] = useState('');
 
-  const handleLoginSubmit = async (evento: React.FormEvent) => {
+  const handleLoginSubmit = async (evento: React.SubmitEvent<HTMLFormElement>) => {
     evento.preventDefault();
     setError('');
 

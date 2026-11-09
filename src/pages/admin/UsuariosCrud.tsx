@@ -65,7 +65,7 @@ export function UsuariosCrud() {
     setEditandoId(null);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (cargandoDisciplinas) return;
     setError('');

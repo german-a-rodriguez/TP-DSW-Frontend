@@ -1,108 +1,139 @@
-// Importamos el hook useState desde la librería de React para manejar el estado local del componente
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { LoginPage } from './pages/LoginPage';
+import { RegistroPage } from './pages/RegistroPage';
+import { AdminPage } from './pages/admin/AdminPage';
+import { EntrenadorPage } from './pages/entrenador/EntrenadorPage';
+import { ClientePage } from './pages/cliente/ClientePage';
+import { parseJwt } from './utils/auth';
+import './App.css';
 
-// Importamos el componente de Login (formulario de inicio de sesión)
-import { LoginForm } from './components/LoginForm';
-import { AutorregistroForm } from './components/AutorregistroForm.tsx';
+// Vistas disponibles para usuarios sin sesión
+type VistaPublica = 'login' | 'autorregistro';
 
-// Importamos los tableros o paneles exclusivos para cada uno de los roles
-import { AdminMenu } from './components/AdminMenu';
-import { EntrenadorMenu } from './components/EntrenadorMenu';
-import { ClienteMenu } from './components/ClienteMenu';
+// Función para determinar la vista pública actual según la URL
+function obtenerVistaDesdeUrl(): VistaPublica {
+  return window.location.pathname === '/registro' ? 'autorregistro' : 'login';
+}
 
-import './App.css'
-
+// Función para obtener la sesión válida desde el localStorage
+// Si no pudo leer el usuario o el token venció, elimina token y rol y devuelve null.
+function obtenerSesionValida() {
+  const token = localStorage.getItem('token');
+  const usuario = token ? parseJwt(token) : null;
+  if (!usuario || (usuario.exp && usuario.exp * 1000 <= Date.now())) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('rol');
+    return null;
+  }
+  return { token, rol: usuario.rol };
+}
 
 export function App() {
-  // Estado para almacenar el token JWT. 
-  // Usamos una función flecha () => localStorage.getItem(...) para leer el almacenamiento del navegador 
-  // una sola vez al cargar la aplicación, evitando re-renders innecesarios.
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
+  const [sesion, setSesion] = useState(obtenerSesionValida);
+  const [vistaPublica, setVistaPublica] =
+    useState<VistaPublica>(obtenerVistaDesdeUrl);
 
-  // Estado para almacenar el rol del usuario logueado ('admin', 'cliente' o 'entrenador')
-  const [rol, setRol] = useState<string | null>(() => localStorage.getItem('rol'));
+  // Una vez que la pantalla se dibujó por primera vez, activamos la escucha
+  // de eventos del navegador (flechas atrás/adelante y sesión expirada)
+  useEffect(() => {
+    // Cuando se ejecute, lee la URL y actualiza la vista
+    const cambiarVista = () => setVistaPublica(obtenerVistaDesdeUrl());
 
-  // ESTADO NUEVO: Controla qué vista pública mostrar cuando el usuario NO está logueado.
-  // Puede ser 'login' o 'autorregistro'. Por defecto arranca en 'login'.
-  const [vistaPublica, setVistaPublica] = useState<'login' | 'autorregistro'>('login');
+    // Cuando se ejecute, quita la sesion del estado y redirige al login
+    const cerrarSesionExpirada = () => {
+      setSesion(null);
+      window.history.pushState(null, '', '/login');
+      setVistaPublica('login');
+    };
 
-  // Función callback que se ejecutará cuando el login en el componente hijo (Login.tsx) sea exitoso.
-  // Recibe el nuevo token y el rol decodificado como parámetros.
-  const handleLoginSuccess = (newToken: string, newRol: string) => {
-    // Actualizamos el estado local del token con el valor recibido
-    setToken(newToken);
-    // Actualizamos el estado local del rol con el valor recibido
-    setRol(newRol);
+    // Actualiza la vista al usar atras o adelante del navegador.
+    window.addEventListener('popstate', cambiarVista);
+
+    // Cierra la sesión cuando api.ts avisa que ya no es válida.
+    window.addEventListener('sesion-expirada', cerrarSesionExpirada);
+
+    // Quitamos las escuchas cuando el componente se desmonta
+    return () => {
+      window.removeEventListener('popstate', cambiarVista);
+      window.removeEventListener('sesion-expirada', cerrarSesionExpirada);
+    };
+  }, []);
+
+  // Actualiza la URL con pushState, sin recargar la página, y cambia la vista
+  const navegar = (vista: VistaPublica) => {
+    const ruta = vista === 'autorregistro' ? '/registro' : '/login';
+    if (window.location.pathname !== ruta)
+      window.history.pushState(null, '', ruta);
+    setVistaPublica(vista);
+  };
+
+  // Guarda la sesión en el estado y cambia la URL a /
+  const handleLoginSuccess = (token: string, rol: string) => {
+    setSesion({ token, rol });
+    window.history.pushState(null, '', '/');
   };
 
   // Función para cerrar la sesión activa del usuario
   const handleLogout = () => {
-    // Eliminamos el token de la memoria persistente del navegador
+    // Eliminamos el token y rol de la memoria peristente del navegador
     localStorage.removeItem('token');
-    // Eliminamos el rol guardado en la memoria del navegador
     localStorage.removeItem('rol');
-    // Reiniciamos el estado del token a null para forzar el renderizado de la pantalla de Login
-    setToken(null);
-    // Reiniciamos el estado del rol a null
-    setRol(null);
-    setVistaPublica('login'); // Al salir, lo devolvemos al login
+    // Limpiamos la sesión en el estado de la aplicación y redirigimos al login
+    setSesion(null);
+    navegar('login');
   };
 
-// 1. CONTROL DE ACCESO PRIVADO: Si el usuario ya tiene token, ignoramos las vistas públicas
-  // y mostramos directamente su panel correspondiente según su rol.
-  if (token) {
-    switch (rol) {
+  if (sesion) {
+    switch (sesion.rol) {
       case 'admin':
-        return <AdminMenu onLogout={handleLogout} />;
+        return <AdminPage onLogout={handleLogout} />;
       case 'entrenador':
-        return <EntrenadorMenu onLogout={handleLogout} />;
+        return <EntrenadorPage onLogout={handleLogout} />;
       case 'cliente':
-        return <ClienteMenu onLogout={handleLogout} />;
+        return <ClientePage onLogout={handleLogout} />;
       default:
         return (
-          <div style={{ padding: '20px', textAlign: 'center' }}>
+          <main className="pagina-acceso">
             <h2>Rol desconocido o no autorizado.</h2>
-            <button onClick={handleLogout}>Cerrar Sesión</button>
-          </div>
+            <button onClick={handleLogout} className="btn btn-rojo">
+              Cerrar sesión
+            </button>
+          </main>
         );
     }
   }
 
-  // 2. CONTROL DE VISTAS PÚBLICAS: Si el usuario NO está logueado, 
-  // le permitimos navegar entre el formulario de Login y el de Registro mediante botones accesibles.
   return (
-    <div style={{ fontFamily: 'sans-serif' }}>
-      {/* Barra de navegación pública superior (disponible en todas las páginas públicas) */}
-      <nav style={{ display: 'flex', justifyContent: 'center', gap: '15px', padding: '15px', background: '#f8f9fa', borderBottom: '1px solid #dee2e6' }}>
-        <button 
-          onClick={() => setVistaPublica('login')}
-          style={{ padding: '8px 15px', background: vistaPublica === 'login' ? '#007bff' : '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+    <>
+      <nav className="barra-publica" aria-label="Acceso">
+        <button
+          onClick={() => navegar('login')}
+          className={vistaPublica === 'login' ? 'btn btn-azul' : 'btn btn-gris'}
         >
           Iniciar Sesión
         </button>
-
-        <button 
-          onClick={() => setVistaPublica('autorregistro')}
-          style={{ padding: '8px 15px', background: vistaPublica === 'autorregistro' ? '#28a745' : '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+        <button
+          onClick={() => navegar('autorregistro')}
+          className={
+            vistaPublica === 'autorregistro' ? 'btn btn-verde' : 'btn btn-gris'
+          }
         >
           Registrarse
         </button>
       </nav>
-
-      {
-        /* Renderizado condicional de la pantalla pública activa */
-      }
       {vistaPublica === 'login' ? (
-        <LoginForm onLoginSuccess={handleLoginSuccess} />
+        <LoginPage
+          onLoginSuccess={handleLoginSuccess}
+          onGoToRegister={() => navegar('autorregistro')}
+        />
       ) : (
-        <AutorregistroForm 
-          onRegisterSuccess={() => setVistaPublica('login')} 
-          onGoToLogin={() => setVistaPublica('login')} 
+        <RegistroPage
+          onRegisterSuccess={() => navegar('login')}
+          onGoToLogin={() => navegar('login')}
         />
       )}
-    </div>
+    </>
   );
 }
 
-// Exportamos el componente App por defecto para que pueda ser utilizado en main.tsx
 export default App;

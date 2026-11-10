@@ -1,0 +1,225 @@
+/* Base mobile: pantallas desde 320px. */
+.barra-publica,
+.barra-navegacion {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.barra-publica {
+  justify-content: center;
+}
+
+.pagina-acceso {
+  padding: 15px 10px;
+}
+
+.formulario-acceso {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.encabezado-acceso,
+.pie-acceso {
+  text-align: center;
+}
+
+.pie-acceso {
+  margin-top: 15px;
+}
+
+.contenedor-panel {
+  max-width: 1100px;
+  margin: 15px auto;
+  padding: 0 10px;
+}
+
+.encabezado-panel {
+  margin-bottom: 20px;
+}
+
+.encabezado-panel h1 {
+  font-size: 24px;
+}
+
+.barra-navegacion {
+  margin-bottom: 20px;
+}
+
+.tarjeta {
+  padding: 12px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.tarjeta h3 {
+  margin-top: 0;
+}
+
+.campos-formulario,
+.grilla-form,
+.registro-fila,
+.campo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+fieldset.campos-formulario {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.grilla-form {
+  max-width: 500px;
+}
+
+.campo-form {
+  min-width: 0;
+  margin-bottom: 10px;
+}
+
+.acciones-celda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btn {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  background: #6c757d;
+  color: white;
+  cursor: pointer;
+}
+
+.btn-azul {
+  background: #007bff;
+}
+
+.btn-verde {
+  background: #28a745;
+}
+
+.btn-rojo {
+  background: #dc3545;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.boton-enlace {
+  padding: 0;
+  border: none;
+  background: none;
+  color: #007bff;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.tabla-crud {
+  width: 100%;
+  min-width: 600px;
+  margin-top: 15px;
+  border-collapse: collapse;
+}
+
+.tabla-crud th,
+.tabla-crud td {
+  padding: 8px;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+.tabla-crud th {
+  background: #f8f9fa;
+}
+
+.mensaje-error {
+  color: #b00020;
+  margin: 10px 0;
+}
+
+.mensaje-exito {
+  color: #218838;
+  margin: 10px 0;
+}
+
+/* SM: los botones y las filas del registro se acomodan en horizontal. */
+@media (min-width: 576px) {
+  .barra-publica,
+  .barra-navegacion,
+  .registro-fila {
+    flex-direction: row;
+  }
+
+  .registro-fila > .campo-form {
+    flex: 1;
+  }
+
+  .pagina-acceso {
+    padding: 20px;
+  }
+
+  .contenedor-panel {
+    padding: 0 15px;
+  }
+
+  .tarjeta {
+    padding: 16px;
+  }
+}
+
+/* MD: formularios en dos columnas. */
+@media (min-width: 768px) {
+  .grilla-form {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 16px;
+    max-width: none;
+  }
+
+  .grilla-form > .campo-form {
+    flex: 1 1 calc(50% - 8px);
+  }
+
+  .barra-publica,
+  .barra-navegacion {
+    padding: 15px;
+  }
+
+  .encabezado-panel h1 {
+    font-size: 28px;
+  }
+}
+
+/* LG: formularios en tres columnas y más espacio en el panel. */
+@media (min-width: 992px) {
+  .grilla-form > .campo-form {
+    flex-basis: calc(33.333% - 11px);
+  }
+
+  .contenedor-panel {
+    margin: 20px auto;
+    padding: 0 24px;
+  }
+
+  .tarjeta {
+    padding: 20px;
+  }
+
+  .encabezado-panel h1 {
+    font-size: 32px;
+  }
+}

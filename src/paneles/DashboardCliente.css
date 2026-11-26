@@ -1,0 +1,291 @@
+/* Dashboard del Cliente (Base Mobile) */
+.dashboard-cliente {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.dashboard-encabezado h1 {
+  margin: 0 0 6px;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.dashboard-encabezado p {
+  margin: 0;
+  color: #a5a5ad;
+  font-size: 14px;
+}
+
+.dashboard-fila-superior {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.dashboard-tarjeta-membresia {
+  flex: 1;
+  background-color: #0d0d10;
+  border: 1px solid #3c4d11;
+  border-radius: 4px;
+  padding: 24px;
+  box-shadow: 0 0 28px #c4ff0014;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.dashboard-titulo-icono {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dashboard-titulo-icono svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: #c4ff00;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+.dashboard-titulo-icono h2 {
+  margin: 0;
+  font-size: 18px;
+  color: #ffffff;
+}
+
+.dashboard-membresia-cuerpo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.dashboard-plan-linea {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.dashboard-plan-nombre {
+  font-size: 24px;
+  font-weight: 800;
+  color: #c4ff00;
+}
+
+.etiqueta-estado {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.estado-activa {
+  background-color: #132f1c;
+  color: #4ade80;
+  border: 1px solid #1f5130;
+}
+
+.estado-pendiente {
+  background-color: #332711;
+  color: #facc15;
+  border: 1px solid #574118;
+}
+
+.estado-vencida,
+.estado-cancelada,
+.estado-inactiva {
+  background-color: #2f1619;
+  color: #f87171;
+  border: 1px solid #57252a;
+}
+
+.dashboard-vencimiento {
+  margin: 0;
+  color: #a5a5ad;
+  font-size: 14px;
+}
+
+.btn-historial {
+  padding: 10px 22px;
+  background-color: #09090b;
+  border: 1px solid #242429;
+  border-radius: 3px;
+  color: #f7f7f7;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-historial:hover {
+  border-color: #c4ff00;
+  color: #c4ff00;
+}
+
+.dashboard-tarjeta-atajos {
+  background-color: #0d0d10;
+  border: 1px solid #19191d;
+  border-radius: 4px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dashboard-tarjeta-atajos h3 {
+  margin: 0;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.dashboard-atajos-grilla {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  flex: 1;
+}
+
+.boton-atajo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 18px 12px;
+  background-color: #141418;
+  border: 1px solid #202026;
+  border-radius: 6px;
+  color: #f7f7f7;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.boton-atajo svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: #c4ff00;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.boton-atajo:hover {
+  background-color: #1b1b21;
+  border-color: #c4ff00;
+}
+
+.dashboard-rutinas-seccion {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dashboard-rutinas-encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.dashboard-rutinas-vacio {
+  background-color: #0b0b0e;
+  border: 1px dashed #222228;
+  border-radius: 4px;
+  padding: 54px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.icono-vacio-circulo {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background-color: #151519;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  color: #8e8e96;
+}
+
+.icono-vacio-circulo svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dashboard-rutinas-vacio h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: #ffffff;
+}
+
+.dashboard-rutinas-vacio p {
+  max-width: 420px;
+  margin: 0 0 22px;
+  color: #8e8e96;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.dashboard-rutinas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dashboard-rutina-item {
+  margin-bottom: 0;
+  background-color: #0d0d10;
+  border-color: #19191d;
+}
+
+.dashboard-rutina-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.dashboard-rutina-cabecera h3 {
+  margin: 0;
+}
+
+.dashboard-rutina-item p {
+  margin: 0;
+  color: #a5a5ad;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+@media (min-width: 992px) {
+  .dashboard-fila-superior {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .dashboard-tarjeta-atajos {
+    width: 310px;
+    flex-shrink: 0;
+  }
+}

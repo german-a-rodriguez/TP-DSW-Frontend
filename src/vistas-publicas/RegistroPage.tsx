@@ -57,17 +57,23 @@ export function RegistroPage({
   };
 
   return (
-    <main className="pagina-acceso">
-      <div className="formulario-acceso">
-        <section className="tarjeta" aria-labelledby="registro-titulo">
-          <div className="encabezado-acceso">
+    <main className="acceso-pagina registro-pagina">
+      <div className="acceso-contenido registro-contenido">
+        <div className="marca-gym acceso-marca">
+          <div>
+            <span>NEXUS</span> GYM
+          </div>
+        </div>
+
+        <section className="acceso-tarjeta" aria-labelledby="registro-titulo">
+          <div className="acceso-encabezado">
             <h1 id="registro-titulo">Registrarse</h1>
-            <p>Completá tus datos para crear una cuenta de cliente.</p>
+            <p>Creá tu cuenta y comenzá tu transformación</p>
           </div>
 
           <form
             onSubmit={handleAutorregistroSubmit}
-            className="campos-formulario"
+            className="acceso-formulario"
           >
             {error && (
               <div className="mensaje-error" role="alert">
@@ -173,17 +179,17 @@ export function RegistroPage({
               </div>
             </div>
 
-            <button type="submit" className="btn btn-verde">
+            <button type="submit" className="btn btn-lima">
               Crear cuenta
             </button>
           </form>
 
-          <div className="pie-acceso">
+          <div className="acceso-pie">
             ¿Ya tenés cuenta?{' '}
             <button
               type="button"
               onClick={onGoToLogin}
-              className="boton-enlace"
+              className="acceso-enlace"
             >
               Iniciá sesión
             </button>

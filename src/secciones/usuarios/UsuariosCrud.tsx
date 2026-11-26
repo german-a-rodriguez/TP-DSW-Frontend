@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { AccionListado, ListadoCrud } from '../../components/ListadoCrud';
+import { useEffect, useRef, useState } from 'react';
 import type { Usuario } from '../../models/Usuario';
 import type { Disciplina } from '../../models/Disciplina';
 import {
@@ -28,6 +29,11 @@ export function UsuariosCrud() {
 
   const [entrenadorSeleccionado, setEntrenadorSeleccionado] = useState<Usuario | null>(null);
   const [disciplinasSeleccionadas, setDisciplinasSeleccionadas] = useState<number[]>([]);
+  const [cargandoDisciplinasId, setCargandoDisciplinasId] = useState<number | null>(null);
+  const [guardandoDisciplinas, setGuardandoDisciplinas] = useState(false);
+  const operacionDisciplinasId = useRef<number | null>(null);
+  const usuariosEnEliminacion = useRef(new Set<number>());
+  const cargandoDisciplinas = cargandoDisciplinasId !== null;
 
   const [error, setError] = useState('');
   const [mensaje, setMensaje] = useState('');
@@ -117,32 +123,49 @@ export function UsuariosCrud() {
   };
 
   const handleEliminar = async (id: number) => {
+    if (operacionDisciplinasId.current === id || usuariosEnEliminacion.current.has(id)) return;
     if (!window.confirm('¿Estás seguro de eliminar este usuario?')) return;
+    usuariosEnEliminacion.current.add(id);
     setError('');
     setMensaje('');
 
     try {
       await eliminarUsuario(id);
+      setEntrenadorSeleccionado((actual) => actual?.id === id ? null : actual);
       setMensaje('Usuario eliminado');
       await cargarDatos();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo completar la operación.');
+    } finally {
+      usuariosEnEliminacion.current.delete(id);
     }
   };
 
   const abrirDisciplinasEntrenador = async (id: number) => {
+    if (operacionDisciplinasId.current !== null || usuariosEnEliminacion.current.has(id)) return;
+    operacionDisciplinasId.current = id;
+    setCargandoDisciplinasId(id);
+    setEntrenadorSeleccionado(null);
+    setDisciplinasSeleccionadas([]);
     setError('');
     setMensaje('');
     try {
       const entrenador = await obtenerUsuarioPorId(id);
-      setDisciplinasSeleccionadas((entrenador.disciplinas || []).map((d) => d.id));
+      if (!Array.isArray(entrenador.disciplinas)) {
+        throw new Error('No se pudieron consultar las disciplinas asignadas al entrenador.');
+      }
+      setDisciplinasSeleccionadas(entrenador.disciplinas.map((d) => d.id));
       setEntrenadorSeleccionado(entrenador);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudieron cargar las disciplinas.');
+    } finally {
+      operacionDisciplinasId.current = null;
+      setCargandoDisciplinasId(null);
     }
   };
 
   const toggleDisciplinaEntrenador = (idDisciplina: number) => {
+    if (operacionDisciplinasId.current !== null) return;
     if (disciplinasSeleccionadas.includes(idDisciplina)) {
       setDisciplinasSeleccionadas(disciplinasSeleccionadas.filter((id) => id !== idDisciplina));
     } else {
@@ -151,7 +174,10 @@ export function UsuariosCrud() {
   };
 
   const guardarDisciplinasEntrenador = async () => {
-    if (!entrenadorSeleccionado) return;
+    if (!entrenadorSeleccionado || operacionDisciplinasId.current !== null) return;
+    if (usuariosEnEliminacion.current.has(entrenadorSeleccionado.id)) return;
+    operacionDisciplinasId.current = entrenadorSeleccionado.id;
+    setGuardandoDisciplinas(true);
     setError('');
     setMensaje('');
 
@@ -161,12 +187,16 @@ export function UsuariosCrud() {
       setEntrenadorSeleccionado(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo completar la operación.');
+    } finally {
+      operacionDisciplinasId.current = null;
+      setGuardandoDisciplinas(false);
     }
   };
 
   return (
     <div>
       <h2>Usuarios</h2>
+      {cargandoDisciplinas && <p role="status">Cargando disciplinas del entrenador…</p>}
       {error && <div className="mensaje-error">{error}</div>}
       {mensaje && <div className="mensaje-exito">{mensaje}</div>}
 
@@ -261,7 +291,7 @@ export function UsuariosCrud() {
           </div>
 
           <div className="acciones-celda">
-            <button type="submit" className="btn btn-azul">
+            <button type="submit" className="btn btn-lima">
               {editandoId ? 'Guardar Cambios' : 'Crear Usuario'}
             </button>
             {editandoId && (
@@ -285,6 +315,7 @@ export function UsuariosCrud() {
               <label key={d.id}>
                 <input
                   type="checkbox"
+                  disabled={guardandoDisciplinas}
                   checked={disciplinasSeleccionadas.includes(d.id)}
                   onChange={() => toggleDisciplinaEntrenador(d.id)}
                 />{' '}
@@ -293,18 +324,17 @@ export function UsuariosCrud() {
             ))}
           </div>
           <div className="acciones-celda">
-            <button onClick={guardarDisciplinasEntrenador} className="btn btn-azul">
-              Guardar Disciplinas
+            <button disabled={guardandoDisciplinas} onClick={guardarDisciplinasEntrenador} className="btn btn-lima">
+              {guardandoDisciplinas ? 'Guardando…' : 'Guardar Disciplinas'}
             </button>
-            <button onClick={() => setEntrenadorSeleccionado(null)} className="btn btn-gris">
+            <button disabled={guardandoDisciplinas} onClick={() => setEntrenadorSeleccionado(null)} className="btn btn-gris">
               Cerrar
             </button>
           </div>
         </div>
       )}
 
-      <div className="tarjeta">
-        <h3>Listado de Usuarios</h3>
+      <ListadoCrud titulo="Listado de Usuarios">
         <table className="tabla-crud">
           <thead>
             <tr>
@@ -328,35 +358,46 @@ export function UsuariosCrud() {
                 <tr key={u.id}>
                   <td>{u.id}</td>
                   <td>{u.rol}</td>
-                  <td>
+                  <td className="listado-nombre">
                     {u.nombre} {u.apellido}
                   </td>
                   <td>{u.nombreUsuario}</td>
                   <td>{u.email}</td>
                   <td>{u.fechaNacimiento ? u.fechaNacimiento.slice(0, 10) : '-'}</td>
                   <td>{u.telefono || '-'}</td>
-                  <td className="acciones-celda">
-                    <button onClick={() => seleccionarParaEditar(u)} className="btn btn-azul">
+                  <td className="acciones-celda listado-acciones">
+                    <AccionListado
+                      accion="editar"
+                      etiqueta={`Editar usuario #${u.id}`}
+                      onClick={() => seleccionarParaEditar(u)}
+                    >
                       Editar
-                    </button>
+                    </AccionListado>
                     {u.rol === 'entrenador' && (
-                      <button
+                      <AccionListado
+                        accion="disciplinas"
+                        etiqueta={`Disciplinas usuario #${u.id}`}
+                        disabled={cargandoDisciplinas || guardandoDisciplinas}
                         onClick={() => abrirDisciplinasEntrenador(u.id)}
-                        className="btn btn-verde"
                       >
                         Disciplinas
-                      </button>
+                      </AccionListado>
                     )}
-                    <button onClick={() => handleEliminar(u.id)} className="btn btn-rojo">
+                    <AccionListado
+                      accion="eliminar"
+                      etiqueta={`Eliminar usuario #${u.id}`}
+                      disabled={cargandoDisciplinasId === u.id || (guardandoDisciplinas && entrenadorSeleccionado?.id === u.id)}
+                      onClick={() => handleEliminar(u.id)}
+                    >
                       Eliminar
-                    </button>
+                    </AccionListado>
                   </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
-      </div>
+      </ListadoCrud>
     </div>
   );
 }

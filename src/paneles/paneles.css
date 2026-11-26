@@ -1,0 +1,273 @@
+/* Paneles internos por rol con barra lateral (Base Mobile) */
+.layout-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #101010;
+}
+
+.barra-lateral {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #08080a;
+  border-bottom: 1px solid #18181b;
+}
+
+.barra-lateral-superior {
+  display: flex;
+  flex-direction: column;
+}
+
+.marca-lateral {
+  padding: 20px 20px 16px;
+  cursor: default;
+}
+
+.menu-lateral {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 14px 14px;
+}
+
+.boton-menu-lateral {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 14px;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: #a5a5ad;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+
+.boton-menu-lateral svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+.boton-menu-lateral:hover {
+  background-color: #141418;
+  color: #ffffff;
+}
+
+.boton-menu-lateral.activo {
+  background-color: #c4ff00;
+  color: #09090b;
+  font-weight: 700;
+}
+
+.pie-lateral {
+  border-top: 1px solid #18181b;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.usuario-lateral {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar-lateral {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #a5a5ad;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a5a5ad;
+  flex-shrink: 0;
+}
+
+.avatar-lateral svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.datos-usuario-lateral {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.datos-usuario-lateral strong {
+  color: #ffffff;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.datos-usuario-lateral span {
+  color: #8e8e96;
+  font-size: 11px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.boton-cerrar-sesion {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 2px;
+  border: none;
+  background: transparent;
+  color: #ff3b30;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.boton-cerrar-sesion svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.boton-cerrar-sesion:hover {
+  color: #ff6b63;
+}
+
+.contenido-panel {
+  flex: 1;
+  min-width: 0;
+  padding: 20px 16px;
+}
+
+.contenedor-panel {
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 16px 14px;
+}
+
+.encabezado-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  background-color: #181818;
+  padding: 14px 16px;
+  border: 1px solid #303034;
+  border-radius: 8px;
+  margin-bottom: 18px;
+}
+
+.encabezado-panel h1 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.encabezado-panel p {
+  margin: 4px 0 0 0;
+  color: #a5a5ad;
+  font-size: 14px;
+}
+
+.barra-navegacion {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 22px;
+  padding: 12px;
+  background-color: #181818;
+  border: 1px solid #303034;
+  border-radius: 8px;
+}
+
+/* El admin centra titulos, formularios y listados en el espacio junto al menu. */
+.panel-admin > .contenido-panel {
+  width: 100%;
+  max-width: none;
+}
+
+.panel-admin > .contenido-panel > div {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+}
+
+.panel-admin > .contenido-panel > div > h2 {
+  margin-top: 8px;
+  margin-bottom: 24px;
+}
+
+.sesion-invalida {
+  text-align: center;
+}
+
+@media (min-width: 576px) {
+  .contenedor-panel {
+    padding: 20px 18px;
+  }
+}
+
+@media (min-width: 768px) {
+  .contenedor-panel {
+    padding: 24px 20px;
+  }
+
+  .layout-panel {
+    flex-direction: row;
+  }
+
+  .barra-lateral {
+    width: 250px;
+    min-height: 100vh;
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    border-bottom: none;
+    border-right: 1px solid #18181b;
+    flex-shrink: 0;
+  }
+
+  .marca-lateral {
+    padding: 24px 20px 26px;
+  }
+
+  .contenido-panel {
+    padding: 28px 32px;
+    max-width: 1200px;
+  }
+
+  .encabezado-panel {
+    padding: 18px 22px;
+  }
+
+  .encabezado-panel h1 {
+    font-size: 24px;
+  }
+}
+
+@media (min-width: 992px) {
+  .contenedor-panel {
+    padding: 28px 20px;
+  }
+}

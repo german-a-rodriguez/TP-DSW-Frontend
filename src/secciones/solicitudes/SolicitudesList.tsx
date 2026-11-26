@@ -1,3 +1,4 @@
+import { AccionListado, ListadoCrud } from '../../components/ListadoCrud';
 import { useEffect, useState } from 'react';
 import type { Solicitud } from '../../models/Solicitud';
 import {
@@ -112,17 +113,20 @@ export function SolicitudesList({ onIrACrearRutina }: SolicitudesListProps) {
       {error && <div className="mensaje-error">{error}</div>}
       {mensaje && <div className="mensaje-exito">{mensaje}</div>}
 
-      <div className="tarjeta">
-        <div className="campo-form" style={{ maxWidth: '300px' }}>
-          <label>Filtrar por Estado:</label>
-          <select value={filtroEstado} onChange={(e) => setFiltroEstado(e.target.value)}>
-            <option value="">Todos los estados</option>
-            <option value="pendiente">Pendiente</option>
-            <option value="aprobada">Aprobada</option>
-            <option value="rechazada">Rechazada</option>
-          </select>
-        </div>
-
+      <ListadoCrud
+        titulo="Listado de Solicitudes"
+        filtros={
+          <div className="campo-form" style={{ maxWidth: '300px', marginBottom: '14px' }}>
+            <label>Filtrar por Estado:</label>
+            <select value={filtroEstado} onChange={(e) => setFiltroEstado(e.target.value)}>
+              <option value="">Todos los estados</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="aprobada">Aprobada</option>
+              <option value="rechazada">Rechazada</option>
+            </select>
+          </div>
+        }
+      >
         <table className="tabla-crud">
           <thead>
             <tr>
@@ -141,23 +145,29 @@ export function SolicitudesList({ onIrACrearRutina }: SolicitudesListProps) {
             ) : (
               solicitudes.map((s) => (
                 <tr key={s.id}>
-                  <td>
+                  <td className="listado-nombre">
                     {s.cliente?.nombre} {s.cliente?.apellido}
                   </td>
                   <td>{s.objetivo}</td>
                   <td>{s.fechaSolicitud ? s.fechaSolicitud.slice(0, 10) : '-'}</td>
-                  <td>{s.estado}</td>
-                  <td className="acciones-celda">
-                    <button onClick={() => verDetalleSolicitud(s.id)} className="btn btn-azul">
+                  <td>
+                    <span className={`etiqueta-estado estado-${s.estado}`}>{s.estado}</span>
+                  </td>
+                  <td className="acciones-celda listado-acciones">
+                    <AccionListado
+                      accion="detalle"
+                      etiqueta={`Ver detalle solicitud #${s.id}`}
+                      onClick={() => verDetalleSolicitud(s.id)}
+                    >
                       Ver detalle
-                    </button>
+                    </AccionListado>
                   </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
-      </div>
+      </ListadoCrud>
 
       {solicitudDetalle && (
         <div className="tarjeta">
@@ -243,7 +253,7 @@ export function SolicitudesList({ onIrACrearRutina }: SolicitudesListProps) {
               </div>
 
               <div className="acciones-celda">
-                <button type="submit" className="btn btn-azul">
+                <button type="submit" className="btn btn-lima">
                   Guardar cambios
                 </button>
 

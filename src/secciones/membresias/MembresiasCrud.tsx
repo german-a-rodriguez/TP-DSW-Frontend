@@ -1,3 +1,4 @@
+import { AccionListado, ListadoCrud } from '../../components/ListadoCrud';
 import { useEffect, useState } from 'react';
 import type { Membresia } from '../../models/Membresia';
 import type { Usuario } from '../../models/Usuario';
@@ -230,7 +231,7 @@ export function MembresiasCrud() {
           </div>
 
           <div className="acciones-celda">
-            <button type="submit" className="btn btn-azul">
+            <button type="submit" className="btn btn-lima">
               {editandoId ? 'Guardar Cambios' : 'Crear Membresía'}
             </button>
             {editandoId && (
@@ -242,8 +243,7 @@ export function MembresiasCrud() {
         </div>
       </form>
 
-      <div className="tarjeta">
-        <h3>Listado de Membresías</h3>
+      <ListadoCrud titulo="Listado de Membresías">
         <table className="tabla-crud">
           <thead>
             <tr>
@@ -265,33 +265,42 @@ export function MembresiasCrud() {
               membresias.map((m) => (
                 <tr key={m.id}>
                   <td>{m.id}</td>
-                  <td>{obtenerNombreCliente(m.cliente)}</td>
+                  <td className="listado-nombre">{obtenerNombreCliente(m.cliente)}</td>
                   <td>{obtenerNombrePlan(m.plan)}</td>
                   <td>{m.fechaInicio ? m.fechaInicio.slice(0, 10) : '-'}</td>
                   <td>{m.fechaFin ? m.fechaFin.slice(0, 10) : '-'}</td>
                   <td>{m.estadoMembresia}</td>
-                  <td className="acciones-celda">
+                  <td className="acciones-celda listado-acciones">
                     {m.estadoMembresia === 'pendiente' && (
-                      <button
+                      <AccionListado
+                        accion="pago"
+                        etiqueta={`Confirmar Pago (Activar) membresía #${m.id}`}
                         onClick={() => handleActivarConPago(m)}
-                        className="btn btn-verde"
                       >
                         Confirmar Pago (Activar)
-                      </button>
+                      </AccionListado>
                     )}
-                    <button onClick={() => seleccionarParaEditar(m)} className="btn btn-azul">
+                    <AccionListado
+                      accion="editar"
+                      etiqueta={`Editar membresía #${m.id}`}
+                      onClick={() => seleccionarParaEditar(m)}
+                    >
                       Editar
-                    </button>
-                    <button onClick={() => handleEliminar(m.id)} className="btn btn-rojo">
+                    </AccionListado>
+                    <AccionListado
+                      accion="eliminar"
+                      etiqueta={`Eliminar membresía #${m.id}`}
+                      onClick={() => handleEliminar(m.id)}
+                    >
                       Eliminar
-                    </button>
+                    </AccionListado>
                   </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
-      </div>
+      </ListadoCrud>
     </div>
   );
 }

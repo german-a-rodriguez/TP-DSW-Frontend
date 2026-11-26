@@ -1,3 +1,4 @@
+import { AccionListado, ListadoCrud } from '../../components/ListadoCrud';
 import { useEffect, useState } from 'react';
 import type { Clase } from '../../models/Clase';
 import type { Disciplina } from '../../models/Disciplina';
@@ -11,15 +12,17 @@ import {
 } from '../../services/claseService';
 import { obtenerDisciplinas } from '../../services/disciplinaService';
 import { obtenerUsuarios } from '../../services/usuarioService';
+import { obtenerUsuarioLogueado } from '../../utils/auth';
 
 export function ClasesCrud() {
+  const usuarioLogueado = obtenerUsuarioLogueado();
   const [clases, setClases] = useState<Clase[]>([]);
   const [disciplinas, setDisciplinas] = useState<Disciplina[]>([]);
   const [entrenadores, setEntrenadores] = useState<Usuario[]>([]);
   const [filtroDisciplinaId, setFiltroDisciplinaId] = useState('');
 
   const [disciplinaId, setDisciplinaId] = useState('');
-  const [entrenadorId, setEntrenadorId] = useState('');
+  const [entrenadorId, setEntrenadorId] = useState(usuarioLogueado?.rol === 'entrenador' ? String(usuarioLogueado.id) : '');
   const [diaSemana, setDiaSemana] = useState('lunes');
   const [horaInicio, setHoraInicio] = useState('09:00');
   const [horaFin, setHoraFin] = useState('10:00');
@@ -54,7 +57,7 @@ export function ClasesCrud() {
 
   const limpiarFormulario = () => {
     setDisciplinaId('');
-    setEntrenadorId('');
+    setEntrenadorId(usuarioLogueado?.rol === 'entrenador' ? String(usuarioLogueado.id) : '');
     setDiaSemana('lunes');
     setHoraInicio('09:00');
     setHoraFin('10:00');
@@ -139,7 +142,7 @@ export function ClasesCrud() {
   return (
     <div>
       <h2>Clases</h2>
-      <p style={{ fontSize: '14px', color: '#666' }}>
+      <p style={{ fontSize: '14px', color: '#a5a5ad' }}>
         Nota: Recordá habilitarle antes la disciplina al entrenador desde la pestaña "Usuarios"
         (botón Disciplinas).
       </p>
@@ -171,6 +174,7 @@ export function ClasesCrud() {
               <label>Entrenador:</label>
               <select
                 value={entrenadorId}
+                disabled={usuarioLogueado?.rol === 'entrenador'}
                 onChange={(e) => setEntrenadorId(e.target.value)}
                 required
               >
@@ -230,7 +234,7 @@ export function ClasesCrud() {
           </div>
 
           <div className="acciones-celda">
-            <button type="submit" className="btn btn-azul">
+            <button type="submit" className="btn btn-lima">
               {editandoId ? 'Guardar Cambios' : 'Crear Clase'}
             </button>
             {editandoId && (
@@ -242,24 +246,25 @@ export function ClasesCrud() {
         </div>
       </form>
 
-      <div className="tarjeta">
-        <h3>Listado de Clases</h3>
-
-        <div className="campo-form" style={{ maxWidth: '320px', marginBottom: '14px' }}>
-          <label>Filtrar por Disciplina:</label>
-          <select
-            value={filtroDisciplinaId}
-            onChange={(e) => setFiltroDisciplinaId(e.target.value)}
-          >
-            <option value="">Todas las disciplinas</option>
-            {disciplinas.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.nombre}
-              </option>
-            ))}
-          </select>
-        </div>
-
+      <ListadoCrud
+        titulo="Listado de Clases"
+        filtros={
+          <div className="campo-form" style={{ maxWidth: '320px', marginBottom: '14px' }}>
+            <label>Filtrar por Disciplina:</label>
+            <select
+              value={filtroDisciplinaId}
+              onChange={(e) => setFiltroDisciplinaId(e.target.value)}
+            >
+              <option value="">Todas las disciplinas</option>
+              {disciplinas.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
+        }
+      >
         <table className="tabla-crud">
           <thead>
             <tr>
@@ -281,7 +286,7 @@ export function ClasesCrud() {
               clases.map((c) => (
                 <tr key={c.id}>
                   <td>{c.id}</td>
-                  <td>{c.disciplina?.nombre}</td>
+                  <td className="listado-nombre">{c.disciplina?.nombre}</td>
                   <td style={{ textTransform: 'capitalize' }}>{c.diaSemana}</td>
                   <td>
                     {c.horaInicio} a {c.horaFin}
@@ -292,23 +297,37 @@ export function ClasesCrud() {
                   <td>
                     {c.cuposDisponibles ?? c.cupos} / {c.cupos}
                   </td>
-                  <td className="acciones-celda">
-                    <button onClick={() => verDetalleClase(c.id)} className="btn btn-gris">
+                  <td className="acciones-celda listado-acciones">
+                    <AccionListado
+                      accion="detalle"
+                      etiqueta={`Ver Detalle clase #${c.id}`}
+                      onClick={() => verDetalleClase(c.id)}
+                    >
                       Ver Detalle
-                    </button>
-                    <button onClick={() => seleccionarParaEditar(c)} className="btn btn-azul">
+                    </AccionListado>
+                    <AccionListado
+                      accion="editar"
+                      etiqueta={`Editar clase #${c.id}`}
+                      disabled={usuarioLogueado?.rol !== 'admin' && c.entrenador.id !== usuarioLogueado?.id}
+                      onClick={() => seleccionarParaEditar(c)}
+                    >
                       Editar
-                    </button>
-                    <button onClick={() => handleEliminar(c.id)} className="btn btn-rojo">
+                    </AccionListado>
+                    <AccionListado
+                      accion="eliminar"
+                      etiqueta={`Eliminar clase #${c.id}`}
+                      disabled={usuarioLogueado?.rol !== 'admin' && c.entrenador.id !== usuarioLogueado?.id}
+                      onClick={() => handleEliminar(c.id)}
+                    >
                       Eliminar
-                    </button>
+                    </AccionListado>
                   </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
-      </div>
+      </ListadoCrud>
 
       {claseDetalle && (
         <div className="tarjeta">

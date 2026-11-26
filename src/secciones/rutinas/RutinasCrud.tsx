@@ -1,3 +1,4 @@
+import { AccionListado, ListadoCrud } from '../../components/ListadoCrud';
 import { useEffect, useState } from 'react';
 import type { Rutina } from '../../models/Rutina';
 import type { Solicitud } from '../../models/Solicitud';
@@ -229,7 +230,7 @@ export function RutinasCrud({ solicitudPreseleccionadaId }: RutinasCrudProps) {
           </div>
 
           <div className="acciones-celda">
-            <button type="submit" className="btn btn-azul">
+            <button type="submit" className="btn btn-lima">
               {editandoId ? 'Guardar Cambios' : 'Crear y Asignar Rutina'}
             </button>
             {editandoId && (
@@ -241,8 +242,7 @@ export function RutinasCrud({ solicitudPreseleccionadaId }: RutinasCrudProps) {
         </div>
       </form>
 
-      <div className="tarjeta">
-        <h3>Rutinas Creadas y Asignadas</h3>
+      <ListadoCrud titulo="Rutinas Creadas y Asignadas">
         <table className="tabla-crud">
           <thead>
             <tr>
@@ -263,24 +263,34 @@ export function RutinasCrud({ solicitudPreseleccionadaId }: RutinasCrudProps) {
               rutinas.map((r) => (
                 <tr key={r.id}>
                   <td>{r.id}</td>
-                  <td>{r.nombre}</td>
+                  <td className="listado-nombre">{r.nombre}</td>
                   <td>{obtenerTextoSolicitud(r.solicitud)}</td>
                   <td>{r.descripcion}</td>
-                  <td>{r.estado}</td>
-                  <td className="acciones-celda">
-                    <button onClick={() => seleccionarParaEditar(r)} className="btn btn-azul">
+                  <td>
+                    <span className={`etiqueta-estado estado-${r.estado}`}>{r.estado}</span>
+                  </td>
+                  <td className="acciones-celda listado-acciones">
+                    <AccionListado
+                      accion="editar"
+                      etiqueta={`Editar rutina #${r.id}`}
+                      onClick={() => seleccionarParaEditar(r)}
+                    >
                       Editar
-                    </button>
-                    <button onClick={() => handleEliminar(r.id)} className="btn btn-rojo">
+                    </AccionListado>
+                    <AccionListado
+                      accion="eliminar"
+                      etiqueta={`Eliminar rutina #${r.id}`}
+                      onClick={() => handleEliminar(r.id)}
+                    >
                       Eliminar
-                    </button>
+                    </AccionListado>
                   </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
-      </div>
+      </ListadoCrud>
     </div>
   );
 }

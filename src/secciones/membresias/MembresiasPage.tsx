@@ -99,7 +99,7 @@ export function MembresiasPage() {
                 </select>
               </div>
               {planesActivos.length === 0 && <p>No hay planes disponibles para contratar.</p>}
-              <button type="submit" className="btn btn-azul" disabled={planesActivos.length === 0}>
+              <button type="submit" className="btn btn-lima" disabled={planesActivos.length === 0}>
                 Contratar plan
               </button>
             </div>
@@ -121,7 +121,7 @@ export function MembresiasPage() {
                       <td>{membresia.estadoMembresia}</td>
                       <td>
                         {membresia.estadoMembresia === 'pendiente' && (
-                          <button className="btn btn-azul"
+                          <button className="btn btn-lima"
                             onClick={() => pagarMembresia(membresia)}>
                             Confirmar pago en efectivo
                           </button>

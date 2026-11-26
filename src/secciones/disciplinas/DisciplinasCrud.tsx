@@ -1,3 +1,4 @@
+import { AccionListado, ListadoCrud } from '../../components/ListadoCrud';
 import { useEffect, useState } from 'react';
 import type { Disciplina } from '../../models/Disciplina';
 import {
@@ -121,7 +122,7 @@ export function DisciplinasCrud() {
           </div>
 
           <div className="acciones-celda">
-            <button type="submit" className="btn btn-azul">
+            <button type="submit" className="btn btn-lima">
               {editandoId ? 'Guardar Cambios' : 'Crear Disciplina'}
             </button>
             {editandoId && (
@@ -133,8 +134,7 @@ export function DisciplinasCrud() {
         </div>
       </form>
 
-      <div className="tarjeta">
-        <h3>Listado de Disciplinas</h3>
+      <ListadoCrud titulo="Listado de Disciplinas">
         <table className="tabla-crud">
           <thead>
             <tr>
@@ -153,22 +153,30 @@ export function DisciplinasCrud() {
               disciplinas.map((d) => (
                 <tr key={d.id}>
                   <td>{d.id}</td>
-                  <td>{d.nombre}</td>
+                  <td className="listado-nombre">{d.nombre}</td>
                   <td>{d.descripcion || '-'}</td>
-                  <td className="acciones-celda">
-                    <button onClick={() => seleccionarParaEditar(d)} className="btn btn-azul">
+                  <td className="acciones-celda listado-acciones">
+                    <AccionListado
+                      accion="editar"
+                      etiqueta={`Editar disciplina #${d.id}`}
+                      onClick={() => seleccionarParaEditar(d)}
+                    >
                       Editar
-                    </button>
-                    <button onClick={() => handleEliminar(d.id)} className="btn btn-rojo">
+                    </AccionListado>
+                    <AccionListado
+                      accion="eliminar"
+                      etiqueta={`Eliminar disciplina #${d.id}`}
+                      onClick={() => handleEliminar(d.id)}
+                    >
                       Eliminar
-                    </button>
+                    </AccionListado>
                   </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
-      </div>
+      </ListadoCrud>
     </div>
   );
 }

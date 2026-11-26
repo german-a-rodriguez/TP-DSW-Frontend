@@ -115,7 +115,7 @@ export function SolicitarRutinaForm() {
               placeholder="Ej: Molestia leve en hombro derecho"
             />
           </div>
-          <button type="submit" className="btn btn-azul">
+          <button type="submit" className="btn btn-lima">
             Enviar solicitud
           </button>
         </div>

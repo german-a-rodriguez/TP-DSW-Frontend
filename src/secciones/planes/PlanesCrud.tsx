@@ -1,3 +1,4 @@
+import { AccionListado, ListadoCrud } from '../../components/ListadoCrud';
 import { useEffect, useState } from 'react';
 import type { Plan } from '../../models/Plan';
 import {
@@ -184,7 +185,7 @@ export function PlanesCrud() {
           </div>
 
           <div className="acciones-celda">
-            <button type="submit" className="btn btn-azul">
+            <button type="submit" className="btn btn-lima">
               {editandoId ? 'Guardar Cambios' : 'Crear Plan'}
             </button>
             {editandoId && (
@@ -196,8 +197,7 @@ export function PlanesCrud() {
         </div>
       </form>
 
-      <div className="tarjeta">
-        <h3>Listado de Planes</h3>
+      <ListadoCrud titulo="Listado de Planes">
         <table className="tabla-crud">
           <thead>
             <tr>
@@ -220,26 +220,34 @@ export function PlanesCrud() {
               planes.map((p) => (
                 <tr key={p.id}>
                   <td>{p.id}</td>
-                  <td>{p.nombre}</td>
+                  <td className="listado-nombre">{p.nombre}</td>
                   <td>${p.precio}</td>
                   <td>{p.duracionEnMeses} mes(es)</td>
                   <td>{p.incluyeClasesGrupales ? 'Sí' : 'No'}</td>
                   <td>{p.activo ? 'Sí' : 'No'}</td>
                   <td>{p.descripcion}</td>
-                  <td className="acciones-celda">
-                    <button onClick={() => seleccionarParaEditar(p)} className="btn btn-azul">
+                  <td className="acciones-celda listado-acciones">
+                    <AccionListado
+                      accion="editar"
+                      etiqueta={`Editar plan #${p.id}`}
+                      onClick={() => seleccionarParaEditar(p)}
+                    >
                       Editar
-                    </button>
-                    <button onClick={() => handleEliminar(p.id)} className="btn btn-rojo">
+                    </AccionListado>
+                    <AccionListado
+                      accion="eliminar"
+                      etiqueta={`Eliminar plan #${p.id}`}
+                      onClick={() => handleEliminar(p.id)}
+                    >
                       Eliminar
-                    </button>
+                    </AccionListado>
                   </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
-      </div>
+      </ListadoCrud>
     </div>
   );
 }

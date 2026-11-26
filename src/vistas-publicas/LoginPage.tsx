@@ -3,11 +3,12 @@ import { loginUsuario } from '../services/authService';
 import { parseJwt } from '../utils/auth';
 
 interface LoginPageProps {
+  avisoSesion?: string;
   onLoginSuccess: (token: string, rol: string) => void;
   onGoToRegister: () => void;
 }
 
-export function LoginPage({ onLoginSuccess, onGoToRegister }: LoginPageProps) {
+export function LoginPage({ avisoSesion, onLoginSuccess, onGoToRegister }: LoginPageProps) {
   const [email, setEmail] = useState('');
   const [contrasenia, setContrasenia] = useState('');
   const [error, setError] = useState('');
@@ -41,15 +42,26 @@ export function LoginPage({ onLoginSuccess, onGoToRegister }: LoginPageProps) {
   };
 
   return (
-    <main className="pagina-acceso">
-      <div className="formulario-acceso">
-        <section className="tarjeta" aria-labelledby="login-titulo">
-          <div className="encabezado-acceso">
+    <main className="acceso-pagina">
+      <div className="acceso-contenido">
+        <div className="marca-gym acceso-marca">
+          <div>
+            <span>NEXUS</span> GYM
+          </div>
+        </div>
+
+        <section className="acceso-tarjeta" aria-labelledby="login-titulo">
+          <div className="acceso-encabezado">
             <h1 id="login-titulo">Iniciar Sesión</h1>
             <p>Ingresá tus credenciales para continuar</p>
           </div>
 
-          <form onSubmit={handleLoginSubmit} className="campos-formulario">
+          <form onSubmit={handleLoginSubmit} className="acceso-formulario">
+            {avisoSesion && (
+              <div className="mensaje-error" role="status">
+                {avisoSesion}
+              </div>
+            )}
             {error && (
               <div className="mensaje-error" role="alert">
                 {error}
@@ -82,17 +94,17 @@ export function LoginPage({ onLoginSuccess, onGoToRegister }: LoginPageProps) {
               />
             </div>
 
-            <button type="submit" className="btn btn-azul">
+            <button type="submit" className="btn btn-lima">
               Ingresar
             </button>
           </form>
 
-          <div className="pie-acceso">
+          <div className="acceso-pie">
             ¿No tenés cuenta?{' '}
             <button
               type="button"
               onClick={onGoToRegister}
-              className="boton-enlace"
+              className="acceso-enlace"
             >
               Registrate
             </button>

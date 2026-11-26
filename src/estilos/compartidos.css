@@ -1,0 +1,185 @@
+/* Marca del gimnasio e iconos de la portada */
+
+.marca-gym {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: -0.5px;
+}
+
+.marca-icono,
+.inicio-icono svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: #c4ff00;
+}
+
+.marca-gym span {
+  color: #c4ff00;
+}
+
+/* Organiza los campos del formulario */
+.campos-formulario {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.campos-formulario > button {
+  align-self: flex-start;
+}
+
+.tarjeta {
+  background-color: #181818;
+  border: 1px solid #303034;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.tarjeta h3 {
+  margin-top: 0;
+  margin-bottom: 14px;
+  color: #c4ff00;
+}
+
+.grilla-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.campo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.campo-form label {
+  font-weight: bold;
+  font-size: 13px;
+  color: #a5a5ad;
+}
+
+.acciones-celda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Botones con los tonos del diseño */
+.btn {
+  padding: 9px 15px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* Verde lima principal */
+.btn-verde,
+.btn-lima {
+  background-color: #c4ff00;
+  color: #0b0b0b;
+}
+
+.btn-verde:hover,
+.btn-lima:hover {
+  background-color: #d5ff48;
+}
+
+/* Botón secundario oscuro */
+.btn-azul,
+.btn-gris {
+  background-color: #111111;
+  border-color: #45454a;
+  color: #f5f5f5;
+}
+
+.btn-azul:hover,
+.btn-gris:hover {
+  background-color: #252525;
+  border-color: #c4ff00;
+}
+
+/* Botón destacado con borde verde lima */
+.btn-naranja {
+  background-color: #242b14;
+  border-color: #c4ff00;
+  color: #c4ff00;
+}
+
+/* Botón eliminar / peligro */
+.btn-rojo {
+  background-color: #29191b;
+  border-color: #64333a;
+  color: #ff9ba4;
+}
+
+.btn-rojo:hover {
+  background-color: #d84d58;
+  color: #ffffff;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.acceso-enlace {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #c4ff00;
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Alertas de éxito y error */
+.mensaje-error {
+  background-color: #301f22;
+  color: #ffc2c9;
+  border: 1px solid #75424a;
+  padding: 12px 14px;
+  border-radius: 6px;
+  margin-bottom: 14px;
+}
+
+.mensaje-exito {
+  background-color: #1c2a15;
+  color: #d4f7a4;
+  border: 1px solid #4a682a;
+  padding: 12px 14px;
+  border-radius: 6px;
+  margin-bottom: 14px;
+}
+
+@media (min-width: 576px) {
+  .grilla-form {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  .tarjeta {
+    padding: 20px;
+  }
+}

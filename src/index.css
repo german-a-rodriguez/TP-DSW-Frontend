@@ -1,28 +1,38 @@
+/* Estilos base generales */
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: white;
-  color: #212529;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #101010;
+  color: #f7f7f7;
 }
 
 input,
 select,
 textarea {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font: inherit;
+  color-scheme: dark;
+  font-family: inherit;
+  background-color: #101010;
+  color: #f7f7f7;
+  border: 1px solid #45454a;
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-size: 14px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #c4ff00;
 }
 
 input[type='checkbox'] {
-  width: auto;
-}
-
-button {
-  font: inherit;
+  width: 18px;
+  height: 18px;
+  accent-color: #c4ff00;
 }

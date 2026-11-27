@@ -7,6 +7,18 @@ export async function obtenerSolicitudes(estado?: string): Promise<Solicitud[]> 
   return data.data;
 }
 
+// Para que no traiga las todas las solicitudes del sistema para mostrar solo las de 1 cliente
+export async function obtenerSolicitudesPorCliente(
+  clienteId: number,
+  estado?: string,
+): Promise<Solicitud[]> {
+  const endpoint = estado
+    ? `/solicitudes/cliente/${clienteId}?estado=${estado}`
+    : `/solicitudes/cliente/${clienteId}`;
+  const data = await peticionApi(endpoint);
+  return data.data;
+}
+
 export async function obtenerSolicitudPorId(id: number): Promise<Solicitud> {
   const data = await peticionApi(`/solicitudes/${id}`);
   return data.data;

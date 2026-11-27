@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useState } from 'react';
 import type { Clase } from '../../models/Clase';
 import type { Disciplina } from '../../models/Disciplina';

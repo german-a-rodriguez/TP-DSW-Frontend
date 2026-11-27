@@ -1,4 +1,5 @@
 import { obtenerHeaders, obtenerMensajeError } from '../utils/auth';
+import { registrarErrorFrontend } from './errorService';
 
 const BASE_URL = 'http://localhost:3000/api';
 
@@ -15,7 +16,12 @@ export async function peticionApi(
   try {
     response = await fetch(`${BASE_URL}${endpoint}`, opciones);
   } catch {
-    throw new Error('No se pudo conectar con el servidor. Revisá tu conexión.');
+    const mensaje = 'No se pudo conectar con el servidor. Revisá tu conexión.';
+    void registrarErrorFrontend({
+      mensaje: `${mensaje} (${endpoint})`,
+      tipoError: 'NetworkError',
+    });
+    throw new Error(mensaje);
   }
 
   // Si la sesión venció (401), limpiamos el token y recargamos para volver al login
@@ -34,10 +40,22 @@ export async function peticionApi(
   try {
     data = await response.json();
   } catch {
-    throw new Error('El servidor no devolvió una respuesta válida.');
+    const mensaje = 'El servidor no devolvió una respuesta válida.';
+    void registrarErrorFrontend({
+      mensaje: `${mensaje} (${endpoint} - HTTP ${response.status})`,
+      tipoError: 'InvalidJsonResponse',
+    });
+    throw new Error(mensaje);
   }
 
   if (!response.ok) {
+    if (response.status >= 500) {
+      void registrarErrorFrontend({
+        mensaje: data?.message || `Error HTTP ${response.status} en ${endpoint}`,
+        tipoError: `Http${response.status}Error`,
+      });
+    }
+
     // Si el backend nos mandó un mensaje o lista de errores específicos, mostramos eso
     if (data.message || data.errores) {
       throw new Error(obtenerMensajeError(data));

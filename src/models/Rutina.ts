@@ -1,5 +1,6 @@
 import type { Usuario } from './Usuario';
 import type { Solicitud } from './Solicitud';
+import type { EjercicioRutina } from './EjercicioRutina';
 
 export interface Rutina {
   id: number;
@@ -8,4 +9,5 @@ export interface Rutina {
   estado: 'activa' | 'inactiva';
   entrenador: Usuario | number;
   solicitud: Solicitud | number;
+  ejerciciosRutina?: EjercicioRutina[];
 }

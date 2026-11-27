@@ -38,3 +38,8 @@ export async function eliminarRutina(id: number) {
     method: 'DELETE',
   });
 }
+
+export async function obtenerRutinaPorId(id: number): Promise<Rutina> {
+  const data = await peticionApi(`/rutinas/${id}`);
+  return data.data;
+}

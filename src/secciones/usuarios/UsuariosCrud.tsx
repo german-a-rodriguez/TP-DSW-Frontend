@@ -15,6 +15,7 @@ import { obtenerDisciplinas } from '../../services/disciplinaService';
 export function UsuariosCrud() {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [disciplinas, setDisciplinas] = useState<Disciplina[]>([]);
+  const [filtroRol, setFiltroRol] = useState<'todos' | 'admin' | 'cliente' | 'entrenador'>('todos');
 
   const [rol, setRol] = useState<'admin' | 'cliente' | 'entrenador'>('cliente');
   const [nombre, setNombre] = useState('');
@@ -193,6 +194,9 @@ export function UsuariosCrud() {
     }
   };
 
+  const usuariosFiltrados =
+    filtroRol === 'todos' ? usuarios : usuarios.filter((u) => u.rol === filtroRol);
+
   return (
     <div>
       <h2>Usuarios</h2>
@@ -334,7 +338,25 @@ export function UsuariosCrud() {
         </div>
       )}
 
-      <ListadoCrud titulo="Listado de Usuarios">
+      <ListadoCrud
+        titulo="Listado de Usuarios"
+        filtros={
+          <div className="campo-form" style={{ maxWidth: '300px', marginBottom: '12px' }}>
+            <label>Filtrar por rol:</label>
+            <select
+              value={filtroRol}
+              onChange={(e) =>
+                setFiltroRol(e.target.value as 'todos' | 'admin' | 'cliente' | 'entrenador')
+              }
+            >
+              <option value="todos">Todos los roles</option>
+              <option value="cliente">Cliente</option>
+              <option value="entrenador">Entrenador</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+        }
+      >
         <table className="tabla-crud">
           <thead>
             <tr>
@@ -349,12 +371,12 @@ export function UsuariosCrud() {
             </tr>
           </thead>
           <tbody>
-            {usuarios.length === 0 ? (
+            {usuariosFiltrados.length === 0 ? (
               <tr>
                 <td colSpan={8}>No hay usuarios registrados.</td>
               </tr>
             ) : (
-              usuarios.map((u) => (
+              usuariosFiltrados.map((u) => (
                 <tr key={u.id}>
                   <td>{u.id}</td>
                   <td>{u.rol}</td>

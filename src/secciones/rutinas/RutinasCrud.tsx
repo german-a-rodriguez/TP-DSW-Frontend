@@ -3,6 +3,9 @@ import { useEffect, useState } from 'react';
 import type { Rutina } from '../../models/Rutina';
 import type { Solicitud } from '../../models/Solicitud';
 import type { Usuario } from '../../models/Usuario';
+import type { Categoria } from '../../models/Categoria';
+import type { Ejercicio } from '../../models/Ejercicio';
+import type { DiaRutina, EjercicioRutina } from '../../models/EjercicioRutina';
 import {
   obtenerRutinas,
   crearRutina,
@@ -11,6 +14,13 @@ import {
 } from '../../services/rutinaService';
 import { obtenerSolicitudes } from '../../services/solicitudService';
 import { obtenerUsuarios } from '../../services/usuarioService';
+import { obtenerCategorias } from '../../services/categoriaService';
+import { obtenerEjercicios } from '../../services/ejercicioService';
+import {
+  obtenerEjerciciosRutina,
+  crearEjercicioRutina,
+  eliminarEjercicioRutina,
+} from '../../services/ejercicioRutinaService';
 import { obtenerUsuarioLogueado } from '../../utils/auth';
 
 interface RutinasCrudProps {
@@ -23,6 +33,9 @@ export function RutinasCrud({ solicitudPreseleccionadaId }: RutinasCrudProps) {
   const [rutinas, setRutinas] = useState<Rutina[]>([]);
   const [solicitudes, setSolicitudes] = useState<Solicitud[]>([]);
   const [entrenadores, setEntrenadores] = useState<Usuario[]>([]);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [ejercicios, setEjercicios] = useState<Ejercicio[]>([]);
+  const [renglones, setRenglones] = useState<EjercicioRutina[]>([]);
 
   const [solicitudId, setSolicitudId] = useState(
     solicitudPreseleccionadaId ? String(solicitudPreseleccionadaId) : ''
@@ -35,19 +48,39 @@ export function RutinasCrud({ solicitudPreseleccionadaId }: RutinasCrudProps) {
   const [estado, setEstado] = useState<'activa' | 'inactiva'>('activa');
 
   const [editandoId, setEditandoId] = useState<number | null>(null);
+
+  // Estado para armar renglones (EjercicioRutina) sobre una rutina
+  const [rutinaActivaId, setRutinaActivaId] = useState('');
+  const [categoriaFiltroId, setCategoriaFiltroId] = useState('');
+  const [ejercicioId, setEjercicioId] = useState('');
+  const [dia, setDia] = useState<DiaRutina>('A');
+  const [orden, setOrden] = useState('1');
+  const [series, setSeries] = useState('3');
+  const [repeticiones, setRepeticiones] = useState('10');
+
   const [error, setError] = useState('');
   const [mensaje, setMensaje] = useState('');
 
   const cargarDatos = async () => {
     try {
-      const [listaR, listaS, listaU] = await Promise.all([
+      const [listaR, listaS, listaU, listaC, listaE, listaER] = await Promise.all([
         obtenerRutinas(),
         obtenerSolicitudes(),
         obtenerUsuarios(),
+        obtenerCategorias(),
+        obtenerEjercicios(),
+        obtenerEjerciciosRutina(),
       ]);
       setRutinas(listaR);
       setSolicitudes(listaS);
       setEntrenadores(listaU.filter((u) => u.rol === 'entrenador'));
+      setCategorias(listaC);
+      setEjercicios(listaE);
+      setRenglones(listaER);
+      setRutinaActivaId((actual) => {
+        if (actual) return actual;
+        return listaR.length > 0 ? String(listaR[0].id) : '';
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo completar la operación.');
     }
@@ -85,15 +118,19 @@ export function RutinasCrud({ solicitudPreseleccionadaId }: RutinasCrudProps) {
           descripcion,
           estado,
         });
+        setRutinaActivaId(String(editandoId));
         setMensaje('Rutina actualizada correctamente');
       } else {
-        await crearRutina({
+        const creada = await crearRutina({
           nombre,
           descripcion,
           estado,
           solicitudId: Number(solicitudId),
           entrenadorId: Number(entrenadorId),
         });
+        if (creada?.data?.id) {
+          setRutinaActivaId(String(creada.data.id));
+        }
         setMensaje('¡Rutina creada y asignada al cliente con éxito! ');
       }
 
@@ -108,6 +145,7 @@ export function RutinasCrud({ solicitudPreseleccionadaId }: RutinasCrudProps) {
     setError('');
     setMensaje('');
     setEditandoId(r.id);
+    setRutinaActivaId(String(r.id));
     setNombre(r.nombre);
     setDescripcion(r.descripcion);
     setEstado(r.estado);
@@ -124,10 +162,55 @@ export function RutinasCrud({ solicitudPreseleccionadaId }: RutinasCrudProps) {
 
     try {
       await eliminarRutina(id);
+      if (rutinaActivaId === String(id)) {
+        setRutinaActivaId('');
+      }
       setMensaje('Rutina eliminada');
       await cargarDatos();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo completar la operación.');
+    }
+  };
+
+  const handleAgregarRenglon = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError('');
+    setMensaje('');
+
+    if (!rutinaActivaId) {
+      setError('Seleccioná primero una rutina para agregar ejercicios.');
+      return;
+    }
+
+    try {
+      await crearEjercicioRutina({
+        rutinaId: Number(rutinaActivaId),
+        ejercicioId: Number(ejercicioId),
+        dia,
+        orden: Number(orden),
+        series: Number(series),
+        repeticiones: Number(repeticiones),
+      });
+      setEjercicioId('');
+      setOrden(String(Number(orden) + 1));
+      setMensaje('Ejercicio agregado a la rutina');
+      await cargarDatos();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo agregar el ejercicio.');
+    }
+  };
+
+  const handleQuitarRenglon = async (idRenglon: number) => {
+    if (!window.confirm('¿Quitar este ejercicio de la rutina?')) return;
+    setError('');
+    setMensaje('');
+
+    try {
+      await eliminarEjercicioRutina(idRenglon);
+      setMensaje('Ejercicio quitado de la rutina');
+      await cargarDatos();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo quitar el ejercicio.');
     }
   };
 
@@ -138,6 +221,25 @@ export function RutinasCrud({ solicitudPreseleccionadaId }: RutinasCrudProps) {
       return `Solicitud #${sol.id} - ${sol.cliente?.nombre} ${sol.cliente?.apellido} (${sol.objetivo})`;
     }
     return `Solicitud #${id}`;
+  };
+
+  const ejerciciosFiltrados =
+    categoriaFiltroId === ''
+      ? ejercicios
+      : ejercicios.filter((ej) => {
+          const idCat = typeof ej.categoria === 'object' ? ej.categoria.id : ej.categoria;
+          return String(idCat) === categoriaFiltroId;
+        });
+
+  const renglonesDeRutina = renglones.filter((er) => {
+    const idRut = typeof er.rutina === 'object' ? er.rutina.id : er.rutina;
+    return String(idRut) === rutinaActivaId;
+  });
+
+  const obtenerNombreEjercicio = (ejRel: Ejercicio | number) => {
+    if (typeof ejRel === 'object' && ejRel?.nombre) return ejRel.nombre;
+    const found = ejercicios.find((e) => e.id === ejRel);
+    return found ? found.nombre : `#${ejRel}`;
   };
 
   return (
@@ -219,13 +321,13 @@ export function RutinasCrud({ solicitudPreseleccionadaId }: RutinasCrudProps) {
           </div>
 
           <div className="campo-form" style={{ marginBottom: '12px' }}>
-            <label>Descripción / Plan de ejercicios detallado:</label>
+            <label>Descripción / Indicaciones generales:</label>
             <textarea
-              rows={4}
+              rows={3}
               value={descripcion}
               onChange={(e) => setDescripcion(e.target.value)}
               required
-              placeholder="Ej: Día 1: Pecho y Tríceps (Press banca 4x10, Fondos 3x12). Día 2: Espalda y Bíceps..."
+              placeholder="Ej: Enfoque progresivo en técnica y control de carga"
             />
           </div>
 
@@ -241,6 +343,162 @@ export function RutinasCrud({ solicitudPreseleccionadaId }: RutinasCrudProps) {
           </div>
         </div>
       </form>
+
+      <div className="tarjeta">
+        <div className="campos-formulario">
+          <h3>Armar ejercicios de la rutina (Categoría → Ejercicio)</h3>
+
+          <form onSubmit={handleAgregarRenglon}>
+            <div className="grilla-form">
+              <div className="campo-form">
+                <label>Rutina:</label>
+                <select
+                  value={rutinaActivaId}
+                  onChange={(e) => setRutinaActivaId(e.target.value)}
+                  required
+                >
+                  <option value="">-- Seleccionar Rutina --</option>
+                  {rutinas.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      #{r.id} - {r.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="campo-form">
+                <label>Filtrar por Categoría:</label>
+                <select
+                  value={categoriaFiltroId}
+                  onChange={(e) => {
+                    setCategoriaFiltroId(e.target.value);
+                    setEjercicioId('');
+                  }}
+                >
+                  <option value="">Todas las categorías</option>
+                  {categorias.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="campo-form">
+                <label>Ejercicio:</label>
+                <select
+                  value={ejercicioId}
+                  onChange={(e) => setEjercicioId(e.target.value)}
+                  required
+                >
+                  <option value="">-- Seleccionar Ejercicio --</option>
+                  {ejerciciosFiltrados.map((ej) => (
+                    <option key={ej.id} value={ej.id}>
+                      {ej.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="campo-form">
+                <label>Día:</label>
+                <select
+                  value={dia}
+                  onChange={(e) => setDia(e.target.value as DiaRutina)}
+                >
+                  <option value="A">Día A</option>
+                  <option value="B">Día B</option>
+                  <option value="C">Día C</option>
+                  <option value="D">Día D</option>
+                </select>
+              </div>
+
+              <div className="campo-form">
+                <label>Orden (1..30):</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="30"
+                  value={orden}
+                  onChange={(e) => setOrden(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="campo-form">
+                <label>Series (1..10):</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={series}
+                  onChange={(e) => setSeries(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="campo-form">
+                <label>Repeticiones (1..100):</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="100"
+                  value={repeticiones}
+                  onChange={(e) => setRepeticiones(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="acciones-celda">
+              <button type="submit" className="btn btn-lima">
+                Agregar ejercicio a la rutina
+              </button>
+            </div>
+          </form>
+
+          {rutinaActivaId && (
+            <table className="tabla-crud" style={{ marginTop: '14px' }}>
+              <thead>
+                <tr>
+                  <th>Día</th>
+                  <th>Orden</th>
+                  <th>Ejercicio</th>
+                  <th>Series</th>
+                  <th>Repeticiones</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                {renglonesDeRutina.length === 0 ? (
+                  <tr>
+                    <td colSpan={6}>Esta rutina todavía no tiene ejercicios cargados.</td>
+                  </tr>
+                ) : (
+                  renglonesDeRutina.map((er) => (
+                    <tr key={er.id}>
+                      <td>Día {er.dia}</td>
+                      <td>{er.orden}</td>
+                      <td className="listado-nombre">{obtenerNombreEjercicio(er.ejercicio)}</td>
+                      <td>{er.series}</td>
+                      <td>{er.repeticiones}</td>
+                      <td className="acciones-celda listado-acciones">
+                        <AccionListado
+                          accion="eliminar"
+                          etiqueta={`Quitar renglón #${er.id}`}
+                          onClick={() => handleQuitarRenglon(er.id)}
+                        >
+                          Quitar
+                        </AccionListado>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
 
       <ListadoCrud titulo="Rutinas Creadas y Asignadas">
         <table className="tabla-crud">

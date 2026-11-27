@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Membresia } from '../../models/Membresia';
 import type { Plan } from '../../models/Plan';
-import { obtenerMembresias, crearMembresia, confirmarPagoMembresia } from '../../services/membresiaService';
+import { obtenerMembresias, crearMembresia, confirmarPagoMembresia, modificarMembresia } from '../../services/membresiaService';
 import { obtenerPlanes } from '../../services/planService';
 import { obtenerUsuarioLogueado } from '../../utils/auth';
 
@@ -68,6 +68,26 @@ export function MembresiasPage() {
     }
   };
 
+  const cancelarMembresia = async (membresia: Membresia) => {
+    const confirmar = window.confirm('¿Estás seguro de que querés cancelar esta membresía?');
+
+    if (!confirmar) return;
+
+    setError('');
+    setMensaje('');
+
+    try {
+      await modificarMembresia(membresia.id, {
+        estadoMembresia: 'cancelada',
+      });
+
+      setMensaje('Membresía cancelada correctamente.');
+      await cargarDatos();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo cancelar la membresía.');
+    }
+  };
+
   const nombrePlan = (plan: Plan | number) => {
     const id = typeof plan === 'number' ? plan : plan.id;
     return planes.find((p) => p.id === id)?.nombre || `Plan #${id}`;
@@ -121,9 +141,21 @@ export function MembresiasPage() {
                       <td>{membresia.estadoMembresia}</td>
                       <td>
                         {membresia.estadoMembresia === 'pendiente' && (
-                          <button className="btn btn-lima"
-                            onClick={() => pagarMembresia(membresia)}>
+                          <button
+                            className="btn btn-lima"
+                            onClick={() => pagarMembresia(membresia)}
+                          >
                             Confirmar pago en efectivo
+                          </button>
+                        )}
+
+                        {(membresia.estadoMembresia === 'activa' ||
+                          membresia.estadoMembresia === 'pendiente') && (
+                          <button
+                            className="btn btn-gris"
+                            onClick={() => cancelarMembresia(membresia)}
+                          >
+                            Cancelar membresía
                           </button>
                         )}
                       </td>

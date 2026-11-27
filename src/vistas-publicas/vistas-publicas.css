@@ -323,3 +323,25 @@
     flex: 1 1 240px;
   }
 }
+
+.btn-ojo {
+  background: transparent;
+  border: none;
+  color: #777;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-ojo:hover {
+  color: #a3d900;
+  transform: scale(1.1);
+}
+
+.btn-ojo:focus-visible {
+  outline: 2px solid #a3d900;
+  border-radius: 6px;
+}

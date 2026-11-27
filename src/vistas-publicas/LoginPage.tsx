@@ -12,6 +12,7 @@ export function LoginPage({ avisoSesion, onLoginSuccess, onGoToRegister }: Login
   const [email, setEmail] = useState('');
   const [contrasenia, setContrasenia] = useState('');
   const [error, setError] = useState('');
+  const [mostrarContrasenia, setMostrarContrasenia] = useState(false);
 
   const handleLoginSubmit = async (evento: React.SubmitEvent<HTMLFormElement>) => {
     evento.preventDefault();
@@ -81,18 +82,36 @@ export function LoginPage({ avisoSesion, onLoginSuccess, onGoToRegister }: Login
               />
             </div>
 
+            
             <div className="campo-form">
               <label htmlFor="login-contrasenia">Contraseña</label>
-              <input
-                id="login-contrasenia"
-                type="password"
-                autoComplete="current-password"
-                value={contrasenia}
-                onChange={(evento) => setContrasenia(evento.target.value)}
-                required
-                placeholder="••••••••"
-              />
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <input
+                  id="login-contrasenia"
+                  type={mostrarContrasenia ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  value={contrasenia}
+                  onChange={(evento) => setContrasenia(evento.target.value)}
+                  required
+                  placeholder="••••••••"
+                  style={{ flex: 1, minWidth: 0 }}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setMostrarContrasenia(!mostrarContrasenia)}
+                  className="btn-ojo"
+                >
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z" />
+                    {!mostrarContrasenia && <circle cx="12" cy="12" r="3" />}
+                    {mostrarContrasenia && <path d="M3 3l18 18" />}
+                  </svg>
+                </button>
+              </div>
             </div>
+
 
             <button type="submit" className="btn btn-lima">
               Ingresar

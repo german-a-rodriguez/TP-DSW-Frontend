@@ -1,3 +1,4 @@
+
 import type { Membresia } from '../models/Membresia';
 import { peticionApi } from './api';
 
@@ -16,9 +17,9 @@ export async function crearMembresia(datos: { clienteId: number; planId: number 
 export async function modificarMembresia(
   id: number,
   datos: {
-    fechaInicio: string;
-    fechaFin: string;
-    estadoMembresia: 'pendiente' | 'activa' | 'vencida' | 'cancelada';
+    fechaInicio?: string;
+    fechaFin?: string;
+    estadoMembresia?: 'pendiente' | 'activa' | 'vencida' | 'cancelada';
   }
 ) {
   return peticionApi(`/membresias/${id}`, {

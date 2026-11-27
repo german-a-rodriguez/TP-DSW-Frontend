@@ -2,14 +2,34 @@ import { useState } from 'react';
 import { SolicitudesList } from '../secciones/solicitudes/SolicitudesList';
 import { RutinasCrud } from '../secciones/rutinas/RutinasCrud';
 import { ClasesCrud } from '../secciones/clases/ClasesCrud';
+import { CategoriasCrud } from '../secciones/categorias/CategoriasCrud';
+import { EjerciciosCrud } from '../secciones/ejercicios/EjerciciosCrud';
 import { obtenerUsuarioLogueado } from '../utils/auth';
 
 export function EntrenadorPage({ onLogout }: { onLogout: () => void }) {
   const usuario = obtenerUsuarioLogueado();
 
-  const [seccion, setSeccion] = useState<'solicitudes' | 'rutinas' | 'crudClases'>('solicitudes');
+  const [seccion, setSeccion] = useState<
+    'solicitudes' | 'rutinas' | 'crudClases' | 'categorias' | 'ejercicios'
+  >('solicitudes');
 
   const [solicitudElegidaId, setSolicitudElegidaId] = useState<number | null>(null);
+
+  // Descomentar lo siguiente para probar error de renderizado en frontend:
+  /*
+  const [romperRender, setRomperRender] = useState(false);
+
+  if (romperRender) {
+    throw new Error('Prueba de ErrorBoundary en render');
+  }
+  */
+  // Y agregar este botón donde casi termina el codigo: luego de la etiqueta </main> y antes de </div>
+  /*  
+      <button type="button" onClick={() => setRomperRender(true)} className="btn btn-rojo">
+        Probar ErrorBoundary
+      </button>
+  */
+  // Luego de presionarlo ver que se registro un error boundary en la db: log_errores y en el arhivo txt del log de errores.
 
   return (
     <div className="layout-panel">
@@ -45,6 +65,30 @@ export function EntrenadorPage({ onLogout }: { onLogout: () => void }) {
                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
               </svg>
               <span>Rutinas</span>
+            </button>
+
+            <button
+              onClick={() => setSeccion('categorias')}
+              className={
+                seccion === 'categorias' ? 'boton-menu-lateral activo' : 'boton-menu-lateral'
+              }
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+              <span>Categorías</span>
+            </button>
+
+            <button
+              onClick={() => setSeccion('ejercicios')}
+              className={
+                seccion === 'ejercicios' ? 'boton-menu-lateral activo' : 'boton-menu-lateral'
+              }
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" />
+              </svg>
+              <span>Ejercicios</span>
             </button>
 
             <button
@@ -106,8 +150,13 @@ export function EntrenadorPage({ onLogout }: { onLogout: () => void }) {
             solicitudPreseleccionadaId={solicitudElegidaId}
           />
         )}
+        {seccion === 'categorias' && <CategoriasCrud />}
+        {seccion === 'ejercicios' && <EjerciciosCrud />}
         {seccion === 'crudClases' && <ClasesCrud />}
       </main>
+      
+
+
     </div>
   );
 }

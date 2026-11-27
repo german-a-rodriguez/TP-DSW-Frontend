@@ -1,5 +1,7 @@
-import { useState } from 'react';
-import { crearSolicitud } from '../../services/solicitudService';
+import { useEffect, useState } from 'react';
+import { ListadoCrud } from '../../components/ListadoCrud';
+import type { Solicitud } from '../../models/Solicitud';
+import { crearSolicitud, obtenerSolicitudesPorCliente } from '../../services/solicitudService';
 import { obtenerUsuarioLogueado } from '../../utils/auth';
 
 export function SolicitarRutinaForm() {
@@ -8,9 +10,32 @@ export function SolicitarRutinaForm() {
   const [altura, setAltura] = useState('');
   const [objetivo, setObjetivo] = useState('');
   const [lesionesPrevias, setLesionesPrevias] = useState('');
+  const [solicitudes, setSolicitudes] = useState<Solicitud[]>([]);
 
   const [error, setError] = useState('');
   const [mensaje, setMensaje] = useState('');
+
+  const cargarSolicitudes = async () => {
+    const usuario = obtenerUsuarioLogueado();
+    if (!usuario) return;
+
+    try {
+      const lista = await obtenerSolicitudesPorCliente(usuario.id);
+      const propias = Array.isArray(lista)
+        ? lista.filter((s) => s.cliente?.id === usuario.id)
+        : [];
+      setSolicitudes(propias);
+    } catch {
+      // Si el backend restringe GET /api/solicitudes a admin/entrenador, no bloqueamos el alta del cliente
+    }
+  };
+
+  useEffect(() => {
+    const iniciar = async () => {
+      await cargarSolicitudes();
+    };
+    iniciar();
+  }, []);
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -39,6 +64,7 @@ export function SolicitarRutinaForm() {
       setAltura('');
       setObjetivo('');
       setLesionesPrevias('');
+      await cargarSolicitudes();
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'No se pudo enviar la solicitud.',
@@ -120,6 +146,43 @@ export function SolicitarRutinaForm() {
           </button>
         </div>
       </form>
+
+      <ListadoCrud titulo="Mis solicitudes de rutina">
+        <table className="tabla-crud">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Objetivo</th>
+              <th>Peso / Altura / Masa</th>
+              <th>Lesiones previas</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {solicitudes.length === 0 ? (
+              <tr>
+                <td colSpan={5}>No hay solicitudes registradas.</td>
+              </tr>
+            ) : (
+              solicitudes.map((s) => (
+                <tr key={s.id}>
+                  <td>{s.fechaSolicitud ? s.fechaSolicitud.slice(0, 10) : '-'}</td>
+                  <td className="listado-nombre">{s.objetivo}</td>
+                  <td>
+                    {s.peso} kg · {s.altura} · {s.masaMuscular}
+                  </td>
+                  <td>{s.lesionesPrevias || 'Ninguna'}</td>
+                  <td>
+                    <span className={`etiqueta-estado estado-${s.estado}`}>
+                      {s.estado}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </ListadoCrud>
     </div>
   );
 }

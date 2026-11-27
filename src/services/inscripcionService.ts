@@ -1,4 +1,3 @@
-
 import type { Inscripcion, CrearInscripcion } from '../models/Inscripcion';
 import { peticionApi } from './api';
 
